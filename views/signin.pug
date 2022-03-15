@@ -1,0 +1,21 @@
+extends layout
+block content 
+    div(class="signin container" style= "margin-top: 50px") 
+        
+        div.center 
+            p= errorMessage 
+            if messages
+                each mess in messages 
+                    span= mess 
+            h3 Sign in 
+            form(action='/signin' method='POST')
+                div.form-group
+                    label(for='email') email 
+                    input(type='email' name= 'email' placeholder= 'email' class='form-control')
+                div.form-group 
+                    label(for= 'password') password
+                    input(type= 'password' name= 'password' placeholder= 'password' class='form-control')
+                button(class='btn btn-primary' type='submit')  Sign in 
+                br
+                br
+                a(href="/change_password_get") Change password 

@@ -1,0 +1,22 @@
+extends users_template 
+block content 
+    div(style="float: right; color: red")
+        form(method="GET" action='/admin/meters/search')
+            input(type="text" placeholder="enter meter info: room, ip, slaveId .." name="search_info" style="width: 300px" )
+            
+            input(type= "submit" value="Search" style= "" )
+    if meters    
+        each meter in meters 
+            div(style="margin-top: 50px; border-bottom: 1px solid")
+            ul 
+                li Modbus Gateway IP Addresss:  #{meter.ip_address} 
+                li Slave ID:  #{meter.slaveId} 
+                li Room:  #{meter.room} 
+                
+                li(style= "color: red") Status: #{status[meter.info]}
+            
+                li
+                    p 
+                        a(href='/admin/meter/'+meter._id+'/delete') Delete Meter
+    else 
+        p no meter available

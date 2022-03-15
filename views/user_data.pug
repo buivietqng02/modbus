@@ -1,0 +1,36 @@
+extends users_template 
+block content 
+    h1 User data 
+    ul  
+        li Username:  #{user.username} 
+        li Email: #{user.email} 
+        if (user.meter)
+            li Connect to meter: #{user.meter.info}
+        
+        
+        li Status:
+        li 
+            a(href=`/admin/users/${user._id}/change_info`) Change user data
+    div.plot_date(style="margin-top: 50px; float: left; padding: 20px")
+                
+        h5 Plot data of energy comsumption per date
+        form(action= `/admin/users/${user._id}/plot/date`, method='get')
+                    
+            div(class="form-group")
+                label(for='date') Please choose date to plot 
+                input(type="date" name= "date" class='form-control')
+                        
+        
+                input(type="submit" value= "PLOT" class='form-control btn-primary')
+    div.plot_month(style="margin-top: 50px; float: left;  padding: 20px")
+                
+        h5 Plot data of energy comsumption per month
+        form(action= `/admin/users/${user._id}/plot/month`, method='get')
+                    
+                        
+            div(class='form-group')
+                label(for='month') Please choose month to plot 
+                input(type="month" name= "month" min="2018-03" placeholder= "yyyy-mm" class='form-control')
+        
+                input(type="submit" value= "PLOT" class='form-control btn-primary') 
+    

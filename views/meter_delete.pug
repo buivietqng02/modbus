@@ -1,0 +1,18 @@
+extends users_template 
+block content 
+    h1 Delete meter 
+    ul 
+        if (meter.room) 
+            li Meter Room:  #{meter.room} 
+        if  (meter.ip_address)
+            li Ip Address: #{meter.ip_address} 
+        if (meter.slaveId)
+            li Slaveid: #{meter.slaveId}
+        
+        li Status: #{status[meter.info]}
+
+    p Do you really want to delete this user ?
+    form(method='POST' action='')
+        div
+            input(type= 'hidden', name= 'meterid', required= true, value= meter._id)
+        button(type='submit' class= 'btn btn-primary') DELETE 

@@ -1,0 +1,76 @@
+extends users_template 
+block content 
+    h1 Power now:  5kWh
+    div(style= "display:flex")
+        
+       
+        div(class= "graph per each hour" style="flex: 1")
+            canvas(id="chart1")
+        div(class="graph accumulated day" style= "flex: 1")
+            canvas(id="chart2")
+    label(for="select day") Select day 
+    input(type= "date" name= "select day" style= "margin-top: 30px")
+        
+        
+    script. 
+            function drawChart(canvas_id, type, data) {
+                const ctx= document.getElementById(canvas_id).getContext('2d');
+                const myChart=new Chart(ctx, {
+                    type: type,
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: data.label,
+                            data: data.data,
+                            backgroundColor: data.color
+                        }]
+                    }
+
+                })
+
+            }
+            function randomColor(){
+                return `rgb(${Math.floor(255*Math.random())},${Math.floor(255*Math.random())},${Math.floor(255*Math.random())})`
+            }
+            
+            var data= {
+                labels: ["3h", "4h", "5h", "6h", "7h", "8h"],
+                data: [4,3,3.5,1,5,4.5],
+                label: "comsumption per hour (kW)",
+                color: [randomColor(),
+                randomColor(),
+                randomColor(),
+                randomColor(),
+                randomColor(),
+                randomColor()
+                ]
+
+            }
+
+
+            drawChart("chart1", "bar",data )
+            var data= {
+                labels: ["21 Jan", "22 Jan", "23 Jan", "24 Jan", "27 Jan", "28 Jan"],
+                data: [40,30,35,10,50,45],
+                label: "comsumption per day (kW)",
+                color: [randomColor(),
+                randomColor(),
+                randomColor(),
+                randomColor(),
+                randomColor(),
+                randomColor()
+                ]
+
+            }
+            drawChart("chart2", "bar", data)
+            function get_current_kw() {
+                fetch()
+            }
+        
+
+
+    
+
+     
+          
+         

@@ -1,0 +1,41 @@
+extends users_template 
+block content 
+    div(class='signin' style="margin-top: 50px") 
+       
+        div.center 
+            h3 Create User
+            if hasErrors 
+                each mess in messages 
+                    span.err= mess 
+            form(action='/admin/signup' method= 'POST' autocomplete="off")
+                div.form-group 
+                    label(for='email') Email 
+                    input(type= 'email' class='form-control' name= 'email' placeholder= 'email' autocomplete="off" required)
+                div.form-group 
+                    label(for='username') Username
+                    input(type= 'text' name= 'username' class='form-control' placeholder= 'username' autocomplete="off")
+                div.form-group 
+                    label(for= 'password') password 
+                    input(type= 'password' name= 'password' placeholder='password' class='form-control' autocomplete="off" required)
+                
+                
+                div.form-group
+                    label(for= 'meter') Connect to meter
+                    select( name= 'meter'  class='select form-control')
+                        
+                            
+                        
+
+                button(type="submit" class= 'btn btn-default') Submit
+    script. 
+        var meters= !{JSON.stringify(meters)}
+        //console.log(meters[0]);
+        var x= document.querySelector('.select');
+        for(let meter of meters){
+        var text= "Room: "+meter.room+ ",slaveId: " + meter.slaveId+",ip Address: "+ meter.ip_address;
+       
+        
+        var option= document.createElement("option");
+        option.text= text;
+        x.add(option);
+        }

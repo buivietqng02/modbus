@@ -1,0 +1,27 @@
+extends users_template 
+block content 
+    h1 Create new meter
+    form(action='' method= 'POST')
+        div.form-group 
+            label(for='name') Modbus TCP meter
+            input(type= 'checkbox' name= 'name'  placeholder= 'username' style= "margin-left: 10px;margin-right: 20px")
+            label(for='name1') Modbus RTU meter
+            input(type= 'checkbox' name= 'name1'  placeholder= 'username' style= "margin-left: 10px;margin-right: 20px")
+
+        div.form-group 
+            label(for='username') Room
+            input(type= 'text' name= 'room' class='form-control' placeholder= '')
+        div.form-group 
+            label(for='ip') Gateway IP address
+            input(type= 'number' name= 'ip1'  placeholder= '' style= "display: inline; width: 50px; margin-left: 10px; margin-top: 10px")
+            span .
+            input(type= 'number' name= 'ip2'  placeholder= '' style= "display:inline;width: 50px; margin-left: 10px; margin-top: 10px")
+            span .
+            input(type= 'number' name= 'ip3'  placeholder= '' style= "display:inline;width: 50px; margin-left: 10px; margin-top: 10px")
+            span .
+            input(type= 'number' name= 'ip4'  placeholder= '' style= "display:inline;width: 50px; margin-left: 10px; margin-top: 10px")
+        div.form-group 
+            label(for='slaveID') Modbus slave ID
+            input(type= 'number' name= 'slaveId' class='form-control' placeholder= '')
+        button(type= "submit") Submit
+        

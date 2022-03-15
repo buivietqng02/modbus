@@ -1,0 +1,16 @@
+extends users_template 
+block content 
+    h1 Delete user 
+    ul  
+        li Username:  #{user.username} 
+        li Email: #{user.email} 
+        if (user.meter)
+            li Connect to meter: #{user.meter.info}
+        
+        li Status: 
+
+    p Do you really want to delete this user ?
+    form(method='POST' action='')
+        div
+            input(type= 'hidden', name= 'userid', required= true, value= user._id)
+        button(type='submit' class= 'btn btn-primary') Delete 

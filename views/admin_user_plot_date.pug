@@ -1,0 +1,28 @@
+extends users_template
+block content 
+    
+     
+
+    div(class="chart")
+        if (!data)
+            p no data to plot
+        
+        div(style= "width: 600px; height: 1000px")
+          canvas(id="myChart")
+    script. 
+         
+        var x = JSON.parse('!{JSON.stringify(time1)}')
+        var y= JSON.parse('!{JSON.stringify(value1)}')
+        const chart= new Chart(
+            document.getElementById("myChart"),
+        {
+            type: 'line',
+            data: {
+                labels: x ,
+                datasets: [{
+                    label: "Plot ",
+                    data:y
+                }]
+            }
+        })
+       
