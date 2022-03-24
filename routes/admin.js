@@ -20,30 +20,37 @@ router.get('/users',  function(req, res, next){
   })
   router.get('/users/search', async function(req, res, next){
     
-    let users= await User.find({});
-    var info= req.query.search_info;
-    console.log(req.query.search_info);
-    var filterUsers=[];
-    users.forEach(function(user){
-        if ((user.email && user.email.includes(info))
-        || (user.username && user.username.includes(info))
-        || (user.room && user.room.includes(info)))
-        {
-            filterUsers.push(user);
-            
-        }
+    User.find({}).populate('meter')
+    .exec(function(err, users){
+      var info= req.query.search_info;
+      console.log(req.query.search_info);
+      var filterUsers=[];
+      users.forEach(function(user){
+          if ((user.email && user.email.includes(info))
+          || (user.username && user.username.includes(info))
+          || (user.room && user.room.includes(info)))
+          {
+              filterUsers.push(user);
+              
+          }
+      })
+      res.render('users', {list: filterUsers, search: req.query.search_info});
     })
-    res.render('users', {users: filterUsers});
+   
   
   })
-  router.post('/user/:id/delete', function(req, res, next){
-    User.findById(req.params.id, function(err, user){
-      if (err) {return next(err);};
-      User.findByIdAndRemove(req.body.userid, function(err){
-        if (err) {return next(err);}
+  router.post('/user/:id/delete', async function(req, res, next){
+        var meters= await ModbusData.find({});
+        for (let meter of meters) {
+          if (meter.user==req.params.id) {
+            meter.user=null;
+            await meter.save();
+            break;
+          }
+        }
+        await User.deleteOne({_id: req.params.id})
         res.redirect('/admin/users');
-      })
-    })
+     
   })
   
 
@@ -60,16 +67,23 @@ router.get('/users',  function(req, res, next){
     var messages= req.flash('error');
     try {
         var meters= await ModbusData.find({});
+
     }
+
     catch(err) {
       res.send("there is error when processing. pls try again");
       return;
 
     }
+    let meters1=[];
+    for (let meter of meters) {
+      if (!meter.user) meters1.push(meter);
+    }
     res.render('signup', {
       messages: messages,
       hasErrors: messages.length>0,
-      meters: meters
+
+      meters: meters1
     });
   })
   router.post('/signup', passport.authenticate('local.signup', {
@@ -86,9 +100,50 @@ router.get('/users',  function(req, res, next){
   }
     res.render('user_data', {user: user});
   })
-  router.get('/users/:id/change_info', function(req,res){
-    res.send('under construction');
+  router.get('/users/:id/change_info',async function(req,res){
+    try {
+      var meters= await ModbusData.find({});
+
+  }
+
+  catch(err) {
+    res.send("there is error when processing. pls try again");
+    return;
+
+  }
+  let meters1=[];
+  for (let meter of meters) {
+    if (!meter.user) meters1.push(meter);
+  }
+  User.findById({_id: req.params.id}).populate('meter').
+  exec(function(err, user){
+    if (err) {return next(err);}
+    res.render('change_user_info', {user: user, meters: meters1})
+
   })
+    
+  })
+  router.post('/users/:id/change_info', async function(req, res, next){
+    if (req.body.meter) { 
+      var splitData= req.body.meter.split(',');
+      var room= splitData[0].split(':')[1].trim();
+      var slaveId=splitData[1].split(':')[1].trim();
+      var ip= splitData[2].split(':')[1].trim();
+     var meter= await ModbusData.findOne({room: room, slaveId: slaveId, ip_address: ip});
+     var user= await User.findById({_id: req.params.id});
+     if (user)  user.meter= meter._id;
+     await user.save();
+     meter.user= user._id;
+     await meter.save();
+    
+    }
+    res.render('change_user_info_post');
+   /*  res.send("dfd"); */
+    
+
+
+  })
+
   router.get('/users/:id/plot/date', function(req, res, next){
     var date= req.query.date
     console.log('data input: '+ date);
@@ -198,14 +253,25 @@ router.get('/users',  function(req, res, next){
   })
   //send data to overview
   router.get('/data', function(req, res, next){
-        User.findOne({email: process.env.admin_email}, function(err, admin){
-          if (err) return next(err);
-         
+        User.findOne({email: process.env.admin_email}).populate('meter')
+        .exec(function(err,admin){
+          if (err) {return next(err);}
+          res.json(admin.meter.datas[admin.meter.datas.length-1])
         })
+ 
+         
+   
   })
+
+
+
+
   router.get('/create_meter', function(req, res){
     res.render('meter');
   })
+  
+
+
   router.post('/create_meter', async function(req, res){
     const room= req.body.room;
     var ip= req.body.ip1+'.'+ req.body.ip2+'.'+ req.body.ip3+'.'+ req.body.ip4;
@@ -223,26 +289,33 @@ router.get('/users',  function(req, res, next){
     else res.render("create_meter_post", {message: "new meter is created"});
       
   })
-  router.get('/meters', async function(req, res){
-    var meters= await ModbusData.find({});
-    res.render("meters_get", {meters: meters, status: Modbus.status});
+  router.get('/meters',  function(req, res, next){
+     ModbusData.find({})
+     .populate('user')
+     .exec(function(err, list){
+        if (err) {return next(err);}
+        res.render("meters_get", {meters: list, status: Modbus.status});
+     });
+    
+    
+  
   })
   router.get('/meters/search', async function(req, res, next){
     
-    let meters= await ModbusData.find({});
+    let meters= await ModbusData.find({}).populate('user').exec();
     var info= req.query.search_info;
     console.log(req.query.search_info);
     var filterMeters=[];
     meters.forEach(function(meter){
         if ((meter.ip_address && meter.ip_address.includes(info))
-        || (meter.room && meter.room.includes(info))
-        || (meter.slaveId && meter.slaveId.includes(info)))
+        || (meter.room && meter.room.includes(info)))
+        
         {
             filterMeters.push(meter);
             
         }
     })
-    res.render('meters_get', {meters: filterMeters});
+    res.render('meters_get', {meters: filterMeters, status: Modbus.status, search: req.query.search_info});
 
   
   })
@@ -255,13 +328,19 @@ router.get('/users',  function(req, res, next){
     }
     res.render('meter_delete', {meter: meter,status: Modbus.status});
   })
-  router.post('/meter/:id/delete', function(req, res){
-    ModbusData.findByIdAndRemove(req.params.id, function(err, user){
-      if (err) {return next(err);};
-       
+  router.post('/meter/:id/delete',async  function(req, res, next){
+      var users= await User.find({});
+      for(let user of users) {
+        if (user.meter== req.params.id) {
+          user.meter= null;
+          await user.save();
+        }
+      }
+      await ModbusData.deleteOne({_id: req.params.id});
+
         res.redirect('/admin/meters');
       })
-    })
+    
 
   //id is the ObjectId of user being called, send to brower in js code
   router.get('/get_current_kw/:id',  async function(req, res, next){
@@ -278,7 +357,7 @@ router.get('/users',  function(req, res, next){
  //get  data kwh when month or day, processing the data in the maner appropriagte
  //if date read hour first  /getsomething/:id(of user)?month=or date=
  //so whenever you want data 
-router.get('/')
+
 
 
 

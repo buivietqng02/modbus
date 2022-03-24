@@ -25,6 +25,7 @@ passport.use('local.signup', new LocalStrategy({
         newUser.email= email;
         newUser.password= newUser.encryptPassword(password);
         newUser.username= req.body.username;
+        console.log(req.body.meter);
         if (req.body.meter) { 
         var splitData= req.body.meter.split(',');
         var room= splitData[0].split(':')[1].trim();
@@ -32,12 +33,21 @@ passport.use('local.signup', new LocalStrategy({
         var ip= splitData[2].split(':')[1].trim();
        var meter= await ModbusData.findOne({room: room, slaveId: slaveId, ip_address: ip});
        newUser.meter= meter._id;
+       
        console.log(meter);
         }
         newUser.save(function(err, result){
             if (err) {
                 return done(err);
             }
+            if (req.body.meter) {
+            meter.user= result._id;
+            
+            meter.save(function(err){
+                if (err) console.log(err);
+                return;
+            })
+        }
             return done(null, newUser);
         })
     })

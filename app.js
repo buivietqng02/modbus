@@ -100,23 +100,30 @@ app.use(function(req, res, next) {
 //section for read modbus data
 
 var Modbus= require('./modbus');
-
+let meters=[], meterInfos=[];
 async function getAllMeterAndStartRead() {
-  
+ 
+
   try{
   var r=await ModbusData.find({});
-    console.log(r)
+    
   }
   catch(err) {
     console.log(err);
     return;
   }
   for(let meter of r) {
-    Modbus.readData(meter, 0);
+    if (!meterInfos.includes(meter.info)) { //add meter to read List if not there
+      meters.push(meter);
+      meterInfos.push(meter.info);
+      Modbus.readData(meter, 0);
+      console.log(`add ${meter.info} to array`);
+    }
+   
   }
 
 }
-getAllMeterAndStartRead();
+//setInterval(getAllMeterAndStartRead, 20000);
 
 
 /* console.log(createRecord(new Date(2021, 1,1,12,0,0), 100));
@@ -127,10 +134,15 @@ getAllMeterAndStartRead();
         console.log(d)}); */
         
 
-    
+    /* Modbus.addRecord('127.0.0.1', 3, Modbus.createRecord(new Date(2022,02,10), 1000)); */
  
- 
-
+/*  ModbusData.findOne({ip_address: '127.0.0.1'}, function(err, meter){
+   if (meter) {
+   
+   Modbus.dataFilterByDate(meter.datas, '2022-03-16');
+   }
+ })
+ */
 
   
   

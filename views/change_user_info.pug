@@ -1,0 +1,29 @@
+extends users_template 
+block content 
+    div 
+        ul 
+            li  User email: #{user.email} 
+            li  User name: #{user.username}
+            if (user.meter)
+                li  Currently connect to meter : #{user.meter.info}
+            else 
+                li currently not connect to any meter
+        form(action="" method="post") 
+            p Change meter to connect 
+            div.form-group
+                    label(for= 'meter') Connect to meter
+                    select( name= 'meter'  class='select form-control' value='')
+                        option(value='' selected)
+            button(type="submit" class= 'btn btn-default') Submit
+    script. 
+        var meters= !{JSON.stringify(meters)}
+        //console.log(meters[0]);
+        var x= document.querySelector('.select');
+        for(let meter of meters){
+        var text= "Room: "+meter.room+ ",slaveId: " + meter.slaveId+",ip Address: "+ meter.ip_address;
+       
+        
+        var option= document.createElement("option");
+        option.text= text;
+        x.add(option);
+        }    

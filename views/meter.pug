@@ -10,18 +10,18 @@ block content
 
         div.form-group 
             label(for='username') Room
-            input(type= 'text' name= 'room' class='form-control' placeholder= '')
+            input(type= 'text' name= 'room' class='form-control' placeholder= '' required)
         div.form-group 
             label(for='ip') Gateway IP address
-            input(type= 'number' name= 'ip1'  placeholder= '' style= "display: inline; width: 50px; margin-left: 10px; margin-top: 10px")
+            input(type= 'number' name= 'ip1'  placeholder= '' style= "display: inline; width: 50px; margin-left: 10px; margin-top: 10px" required)
             span .
-            input(type= 'number' name= 'ip2'  placeholder= '' style= "display:inline;width: 50px; margin-left: 10px; margin-top: 10px")
+            input(type= 'number' name= 'ip2'  placeholder= '' style= "display:inline;width: 50px; margin-left: 10px; margin-top: 10px" required)
             span .
-            input(type= 'number' name= 'ip3'  placeholder= '' style= "display:inline;width: 50px; margin-left: 10px; margin-top: 10px")
+            input(type= 'number' name= 'ip3'  placeholder= '' style= "display:inline;width: 50px; margin-left: 10px; margin-top: 10px" required)
             span .
-            input(type= 'number' name= 'ip4'  placeholder= '' style= "display:inline;width: 50px; margin-left: 10px; margin-top: 10px")
+            input(type= 'number' name= 'ip4'  placeholder= '' style= "display:inline;width: 50px; margin-left: 10px; margin-top: 10px" required)
         div.form-group 
             label(for='slaveID') Modbus slave ID
-            input(type= 'number' name= 'slaveId' class='form-control' placeholder= '')
+            input(type= 'number' name= 'slaveId' class='form-control' placeholder= '' required)
         button(type= "submit") Submit
         

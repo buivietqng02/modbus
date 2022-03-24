@@ -5,6 +5,7 @@ block content
             input(type="text" placeholder="enter meter info: room, ip, slaveId .." name="search_info" style="width: 300px" )
             
             input(type= "submit" value="Search" style= "" )
+   
     if meters    
         each meter in meters 
             div(style="margin-top: 50px; border-bottom: 1px solid")
@@ -12,11 +13,24 @@ block content
                 li Modbus Gateway IP Addresss:  #{meter.ip_address} 
                 li Slave ID:  #{meter.slaveId} 
                 li Room:  #{meter.room} 
-                
-                li(style= "color: red") Status: #{status[meter.info]}
+                if status[meter.info]
+                    li(style="font-weight: bold") status: #{status[meter.info]}
+                else 
+                    li(style="color:red; font-weight:bold") status: not connected
             
                 li
                     p 
                         a(href='/admin/meter/'+meter._id+'/delete') Delete Meter
+                if meter.user 
+                    li connect to: #{meter.user.email}
+                else 
+                    li(style="color: red") not connect to any user
+                
     else 
-        p no meter available
+        p not any meter available
+    
+    script().
+        var search = !{JSON.stringify(search)}
+        if (search==undefined) search= ''
+        document.querySelector('input[type=text').value= `${search}`
+       

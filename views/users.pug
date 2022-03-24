@@ -5,17 +5,25 @@ block content
             input(type="text" placeholder="enter user info: user name, email, room .." name="search_info" style="width: 300px" )
             
             input(type= "submit" value="Search" style= "" )
-        
-    each user in list 
-        div(style="margin-top: 50px; border-bottom: 1px solid")
-          ul 
-            li Username:  #{user.username} 
-            li Email:  #{user.email} 
-            if (user.meter)
-                li Connect to meter:  #{user.meter.info} 
-             
-            li 
-                a(href='/admin/users/'+ user.id) Go to user data
-            li
-                p 
-                    a(href='/admin/user/'+user.id+'/delete') Delete User
+    if list  
+        each user in list 
+            div(style="margin-top: 50px; border-bottom: 1px solid")
+            ul 
+                li Username:  #{user.username} 
+                li Email:  #{user.email} 
+                if (user.meter)
+                    li Connect to meter:  #{user.meter.info} 
+                else 
+                    li(style="color: red") Not link to any meter
+                
+                li 
+                    a(href='/admin/users/'+ user.id) Go to user data
+                li
+                    p 
+                        a(href='/admin/user/'+user.id+'/delete') Delete User
+    else 
+        p no user
+    script().
+        var search = !{JSON.stringify(search)}
+        if (search==undefined) search= ''
+        document.querySelector('input[type=text').value= `${search}`

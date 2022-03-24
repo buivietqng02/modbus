@@ -9,13 +9,24 @@ html
         ul {
             list-style-type: none
         }
+        button {
+            background-color: grey;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
      
       
     
   body
    
     div(class="container-fluid header" style= "margin-top: 50px")
-        h2 CUSTOMER MANAGEMENT SITE  
+        div.row
+            h2 CUSTOMER MANAGEMENT SITE 
+            button(style="display:block;margin-left: 60%;") 
+                a(href='/' style="color: white") Signout 
+
+                
                 
     
 
