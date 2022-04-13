@@ -25,12 +25,50 @@ block content
                     li connect to: #{meter.user.email}
                 else 
                     li(style="color: red") not connect to any user
+                li 
+                    input(type= "date")
+                    label(for="") Number of data 
+                    input(type= 'number')
+                    button(class="add-data") Add Data  
                 
     else 
         p not any meter available
     
     script().
         var search = !{JSON.stringify(search)}
-        if (search==undefined) search= ''
+        if (typeof search == undefined) {search= ''}
         document.querySelector('input[type=text').value= `${search}`
+        var buttons= document.getElementsByClassName("add-data")
+        console.log(buttons)
+        for(let button of buttons){
+            button.addEventListener('click', function(e){
+                var parent= e.target.parentNode.parentNode
+                console.log(parent)
+                console.log(parent.children[0].innerText.split(":")[1].trim())
+                
+                console.log(parent.children[1].innerText.split(":")[1])
+                //body.ip,body.slaveId, body.date, body.n
+                var ip= parent.children[0].innerText.split(":")[1].trim()
+                var slaveId= parent.children[1].innerText.split(":")[1].trim()
+                console.log(typeof slaveId)
+                var numberSlaveId= Number(slaveId)
+                console.log(typeof numberSlaveId)
+                console.log(numberSlaveId)
+                var date=this.parentNode.children[0].value
+                var n= this.parentNode.children[2].value
+                if (!date || !n) return
+                var data= {ip: ip, slaveId: numberSlaveId, date: date, n: n}
+                console.log(data);
+                fetch('/admin/add_records', {
+                    method: 'post',
+                    headers: {
+                    'content-type':'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response=> response.json())
+                .then(text=> console.log(text))
+                
+            })
+        }
        

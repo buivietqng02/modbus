@@ -23,9 +23,9 @@
                 })
                 .catch(err=> console.log(err))
             }
-             get_current_kw()
+             setInterval(get_current_kw, 2000)
              //plot when load
-              
+              var id = !{JSON.stringify(id)}
                
                 var dateFormat= new Date()
                 let date= `${dateFormat.getFullYear()}-${dateFormat.getMonth()+1}-${dateFormat.getDate()}`

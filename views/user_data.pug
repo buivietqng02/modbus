@@ -12,26 +12,24 @@ block content
         li Status:
         li 
             a(href=`/admin/users/${user._id}/change_info`) Change user data
-    div.plot_date(style="margin-top: 50px; float: left; padding: 20px")
-                
-        h5 Plot data of energy comsumption per date
-        form(action= `/admin/users/${user._id}/plot/date`, method='get')
-                    
-            div(class="form-group")
-                label(for='date') Please choose date to plot 
-                input(type="date" name= "date" class='form-control')
-                        
-        
-                input(type="submit" value= "PLOT" class='form-control btn-primary')
-    div.plot_month(style="margin-top: 50px; float: left;  padding: 20px")
-                
-        h5 Plot data of energy comsumption per month
-        form(action= `/admin/users/${user._id}/plot/month`, method='get')
-                    
-                        
-            div(class='form-group')
-                label(for='month') Please choose month to plot 
-                input(type="month" name= "month" min="2018-03" placeholder= "yyyy-mm" class='form-control')
-        
-                input(type="submit" value= "PLOT" class='form-control btn-primary') 
     
+    h3 Chart
+    h5(id="current") Power now:  5kWh  
+    div(class= "container")
+       
+       
+        div(class= "graph per each hour" )
+            canvas(id="chart1")
+            div
+                label(for="select day") Select day
+                input(type= "date" name= "select day" )
+        div(class="graph accumulated day" )
+            canvas(id="chart2")
+            div
+                label(for="select day") Select month 
+                input(type= "month"  )
+    script. 
+        var id1 =location.href.split('/')
+        var id= id1[id1.length-1] 
+
+    script(src='http://localhost:3000/javascripts/file1.js' type='text/javascript')   

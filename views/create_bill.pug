@@ -1,0 +1,9 @@
+extends users_template 
+block content 
+    div(id= "bill-section")
+        h4 Choose month to create invoice 
+        input(type= "month")
+        button(id="create") CREATE
+        p Working in process 
+        p Succesfull create bill 
+    script(src="../javascripts/create_bill.js")

@@ -11,7 +11,7 @@ const {body, validationResult} = require('express-validator');
 /* GET users listing. */
 //index page
 router.get('/', function(req, res, next) {
-  res.render('index');
+  res.redirect('/signin');
 });
 //dang nhap page
 router.get('/signin', function(req, res, next){
@@ -41,22 +41,21 @@ router.post('/signin', passport.authenticate('local.signin', {
 //plot a user data using query month or date
 router.get('/user/:id', async function(req, res, next){
   try {
- var user= await User.find({_id: req.params.id});
+ var user= await User.findById({_id: req.params.id});
   }
   catch(err) {
     next(err);
     }
     if (!user) 
     {res.end('no user found');return }
- console.log(user[0].email);
  
- var formActionDate=  req.url+'/plot/date';
-var formActionMonth= req.url+'/plot/month';
-var formViewBill= req.url+ '/invoice';
- res.render('user_page', {email: user[0].email, req: req, 
-  formActionDate:formActionDate,
-   formActionMonth:formActionMonth,
-   formViewBill: formViewBill });
+ 
+ 
+  console.log(req.session);
+  res.render('user_page', {email: user.email, id: req.session.passport.user, 
+ 
+   
+   });
 })
 //return data to plot
 router.get('/user/:id/plot/date',async  function(req, res, next){

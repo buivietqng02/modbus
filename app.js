@@ -21,29 +21,36 @@ var pdf= require('html-pdf');
 var modbus= require('jsmodbus')
 app.use(session({
   secret:'cat',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {maxAge: 24*60*60*1000}
+  resave: true,
+  saveUninitialized: true,
+  cookie: {maxAge: 60*60*60*1000} 
 }));
 
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-/* app.use(function(req, res, next){
-  if (req.session) {
-    if (!req.session.passport) {res.redirect('/signin');}
-    else next();
-  }
-        }) */
+app.use(function(req, res, next){
+  if ((!req.session) || (!req.session.passport)){
+    if (req.url!='/signin')  res.redirect('/signin')
+
+  }  
+  next();
+
+        })
 // view engine setup
+app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+
+
+
+
 /*  try {
   mongoose.connect('mongodb+srv://vietbk02:vietbk02@cluster0.8yaqq.mongodb.net/nodemailer?retryWrites=true&w=majority',
   {
@@ -75,7 +82,7 @@ catch (err) {
     
         const db= mongoose.connection;
         
-        console.log(db);
+        //console.log(db);
        
         db.once('open', ()=> {
           console.log('connected to db local');
@@ -121,28 +128,15 @@ async function getAllMeterAndStartRead() {
     }
    
   }
+  
+  console.log(Modbus.socketList);
 
 }
 //setInterval(getAllMeterAndStartRead, 20000);
 
+//Modbus.addRecord('192.168.1.2',11, new Date(2022, 3,12), 100);
 
-/* console.log(createRecord(new Date(2021, 1,1,12,0,0), 100));
-  var d=  Modbus.addRecord('192.168.1.3', 3, createRecord(new Date(2021, 1,1,12,0,0), 100)); 
-  d.then(m=> Modbus.dataFilterByMonth(m, '2021-02'))
-  .then(d=>Modbus.reducerMonth(d))
-  .then(d=>{console.log("reduce");
-        console.log(d)}); */
-        
-
-    /* Modbus.addRecord('127.0.0.1', 3, Modbus.createRecord(new Date(2022,02,10), 1000)); */
- 
-/*  ModbusData.findOne({ip_address: '127.0.0.1'}, function(err, meter){
-   if (meter) {
-   
-   Modbus.dataFilterByDate(meter.datas, '2022-03-16');
-   }
- })
- */
+//test Modbus.dataFilterByMonth
 
   
   

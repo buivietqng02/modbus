@@ -11,7 +11,7 @@ router.get('/users',  function(req, res, next){
      User.find({}).populate('meter')
      .exec(function(err, list){
        if (err) {return next(err);}
-       res.render('users', {list: list})
+       res.render('users', {list: list, search: ''})
      })
   
   
@@ -130,12 +130,19 @@ router.get('/users',  function(req, res, next){
       var slaveId=splitData[1].split(':')[1].trim();
       var ip= splitData[2].split(':')[1].trim();
      var meter= await ModbusData.findOne({room: room, slaveId: slaveId, ip_address: ip});
+     console.log(meter);
      var user= await User.findById({_id: req.params.id});
-     if (user)  user.meter= meter._id;
-     await user.save();
-     meter.user= user._id;
-     await meter.save();
-    
+     if (user) {
+       if (user.meter) {
+         const oldMeter= await ModbusData.findById({_id: user.meter});
+         oldMeter.user= null;
+         await oldMeter.save();
+       }
+        user.meter= meter._id;
+       await user.save();
+      meter.user= user._id;
+      await meter.save();
+     }
     }
     res.render('change_user_info_post');
    /*  res.send("dfd"); */
@@ -227,17 +234,21 @@ router.get('/users',  function(req, res, next){
     res.send("under construction");
   })
   router.get('/users/bill_create/bill', async function(req, res){
+    try {
       var month= req.query.month;
       
-      //Modbus.createBill
-      //Modbus.convertToPDF
+     
       console.log(month);
          var users= await User.find({});
          users.forEach(function(user){
          Modbus.createBill(user._id, month);
       
         }) 
-        res.render('user_invoice', {message: "done"});
+      }
+      catch (err) {
+        return res.json({message: err});
+      }
+        res.json( {message: "done"});
         
       
       
@@ -248,20 +259,21 @@ router.get('/users',  function(req, res, next){
 
   })
   router.get('/overview', function(req, res){
+    var user_id= req.session.passport.user;
 
-      res.render('overview');
+      res.render('overview', {id: user_id});
   })
   //send data to overview
-  router.get('/data', function(req, res, next){
-        User.findOne({email: process.env.admin_email}).populate('meter')
-        .exec(function(err,admin){
-          if (err) {return next(err);}
-          res.json(admin.meter.datas[admin.meter.datas.length-1])
-        })
+  router.get('/:id/current_kw', function(req, res, next){
+       ModbusData.findOne({ip_address: '127.0.0.1'}, function(err, meter){
+
+         res.send(meter.datas[meter.datas.length-1])
+       })
  
          
    
   })
+  
 
 
 
@@ -294,7 +306,7 @@ router.get('/users',  function(req, res, next){
      .populate('user')
      .exec(function(err, list){
         if (err) {return next(err);}
-        res.render("meters_get", {meters: list, status: Modbus.status});
+        res.render("meters_get", {meters: list, status: Modbus.status, search: ''});
      });
     
     
@@ -336,6 +348,21 @@ router.get('/users',  function(req, res, next){
           await user.save();
         }
       }
+      var meter = await ModbusData.findById({_id: req.params.id});
+      if (Modbus.socketList[meter.info]) {
+        var socket=  Modbus.socketList[meter.info];
+          if (socket.connecting) {
+            console.log("try to connect");
+          }
+        //socket.unref();
+       // socket.destroy();
+        //socket.emit('close');
+
+        socket.removeAllListeners("close");
+        socket.removeAllListeners("connect");
+        socket.destroy();
+        delete Modbus.socketList[meter.info];
+      }
       await ModbusData.deleteOne({_id: req.params.id});
 
         res.redirect('/admin/meters');
@@ -345,22 +372,72 @@ router.get('/users',  function(req, res, next){
   //id is the ObjectId of user being called, send to brower in js code
   router.get('/get_current_kw/:id',  async function(req, res, next){
     try {
-    var meter= ModbusData.findById(req.params.id);
+    var user= await User.findById({_id:req.params.id });
+    console.log(user);
+   
+     
+    if  (!user || !user.meter )  {return res.json("no data");}
+    var meter= await  ModbusData.findById({_id: user.meter});
+    if (!meter || !meter.datas|| meter.datas.length==0) return res.json("no database")
+    console.log(meter.datas[meter.datas.length-1].value[0])
+    res.json(meter.datas[meter.datas.length-1].value);
+
     }
-    catch (err) {
-      console.log(err);
-      next(err);
+    catch (error) {
+      next(error)
+
     }
-    res.json(meter.datas[meter.datas.length-1]);
+    
 
   })
  //get  data kwh when month or day, processing the data in the maner appropriagte
  //if date read hour first  /getsomething/:id(of user)?month=or date=
  //so whenever you want data 
 
+router.get('/:id/plot', async function(req, res,next){
+  try {
+    var user = await User.findById({_id: req.params.id});
+    if (!user) { return res.json("no user found");}
+    if (!user.meter) {return res.json("no meter connected with user");}
+    var meter = await ModbusData.findById({_id: user.meter});
+    var date= req.query.date; //yyyy-mm-dd
+    var month= req.query.month;
+    if (date) {
+          if (!meter.datas) {return res.json("meter with no data");}
+          console.log(Modbus.dataFilterByDate(meter.datas, date));
+          var data=Modbus.dataFilterByDate(meter.datas, date);
+          if (data.length ==0) {return res.json("no data on this date");}
+          res.json(data);
+    }
+    if (month) {
+      if (!meter.datas) {return res.json("meter with no data");}
+      console.log(Modbus.dataFilterByMonth(meter.datas,month ));
+      var data=Modbus.dataFilterByMonth(meter.datas, month);
+      if (data.length ==0) {return res.json("no data on this date");}
+      res.json(data);
+    }
+
+  }
+  catch (err) {
+    next(err);
+  }
+
+})
+
+router.post('/add_records', async function(req, res){
+  var body= req.body;
+  console.log(req.body);
+  console.log(body.ip);
+  console.log(body.slaveId);
+  console.log(body.date);
+  console.log(body.n);
+  Modbus.addRecord(body.ip,Number(body.slaveId), new Date(body.date), Number(body.n));
+  res.json("added");
 
 
-
+})
   
-
+router.get('/create_bill', function(req, res, next){
+  res.render('create_bill')
+})
   module.exports= router;

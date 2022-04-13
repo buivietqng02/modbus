@@ -1,0 +1,25 @@
+button {
+    margin: 40px;
+    width: 50%;
+
+}
+.container-fluid {
+    margin-top: 50px;
+}
+button#chart, button#bill {
+    padding: 20px;
+}
+div.menu {
+    background-color: lightgrey
+}
+label {
+        display: block;
+}
+h3 {
+    text-align: center;
+    background: black;
+    color: white;
+}
+.menu {
+    padding-top: 30px;
+}

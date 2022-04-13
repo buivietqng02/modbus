@@ -1,0 +1,42 @@
+ul {
+    list-style-type: none
+}
+button {
+    background-color: grey;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.container-fluid {
+    margin-top: 50px;
+}
+button#chart, button#bill {
+    padding: 20px;
+}
+div.menu {
+    background-color: rgb(172, 158, 158)
+}
+h2 {
+    text-align: center;
+}
+h3 {
+    text-align: center;
+    background: black;
+    color: white;
+}
+.menu {
+    padding-top: 30px;
+}
+.container {
+    display: flex;
+    flex-direction: row;
+}
+input {
+    display: block;
+}
+label {
+    display: block;
+}
+.graph {
+    flex: 1;
+}

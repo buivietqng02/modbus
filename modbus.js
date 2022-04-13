@@ -10,11 +10,13 @@ const path= require("path");
 var status={};
 const nodemailer= require("nodemailer");
 exports.status= status;
+var socketList= {};
+exports.socketList= socketList;
 exports.readData=async function(meter, registerAddress){
 	const socket= new net.Socket();
 	//client thi chi co mot, 
 	const client= new modbus.client.TCP(socket,meter.slaveID);
-  
+	socketList[meter.info]= socket;
 	var options= {
 		"host": meter.ip_address,
 		"port": "502"
@@ -24,6 +26,7 @@ exports.readData=async function(meter, registerAddress){
 		console.log("connected  to: "+ socket.remoteAddress);
 		status[meter.info]="connected";
 		var t= setInterval(async function(){
+			
               
 			try {
 
@@ -59,13 +62,18 @@ exports.readData=async function(meter, registerAddress){
 	socket.on("error", function(error){
 		console.log("error when access ip:"+ meter.ip_address+" error code "+ error.code);
 		status[meter.info]="error when access ip:"+ meter.ip_address+" error code "+ error.code;
-                
-		setTimeout( function() {socket.connect(options);
-		}, 20000);// if error try to reconnect
-		//socket.end();
+        if (socket.destroyed) {
+			console.log("socket is destroyd");
+		}
+		
   
 	});
-
+ 	socket.on("close", function(){
+		console.log("socket is closed");
+		setTimeout( function() {socket.connect(options);
+		}, 20000);
+		
+	}) 
 };
 
 
@@ -82,7 +90,7 @@ var reducerDate=function(arr) {
 	let retArr=[];
 	for (let hour=0; hour<=23; hour++) {
 		for (let index=0;index< arr.length; index++){
-			if ((arr[index].time.getHours()==hour) & (arr[index].time.getMinutes()==0)) {
+			if ((arr[index].time.getHours()==hour) ) {
 				retArr.push(arr[index]);
 				break;
 			}
@@ -91,9 +99,7 @@ var reducerDate=function(arr) {
 	return retArr;
 };
 exports.dataFilterByDate= function(datas, dateInput){
-	//function get number of distributedd point from an array
-	// datas in data array from modbus data of mongodb
-	// dateInput is in string format yyyy-mm-dd
+
     
 	var obj= dateInput.split("-");
 	var year= obj[0];
@@ -112,47 +118,46 @@ exports.dataFilterByDate= function(datas, dateInput){
     
 	return ret;
 };
-exports.reducerMonth=function(arr) {
-  
+var reducerMonth=function(arr, month, year) {
+	function daysInMonth (month, year) {
+		return new Date(year, month, 0).getDate();
+	}
+  let retArr= [], numberOfDays= daysInMonth(month, year);
+  console.log(`number of days in month ${month} of year ${year} is ${numberOfDays}`);
+  for (let i= 1; i<= numberOfDays; i++) {
+	for(let j=0; j< arr.length; j++) {
+		if (arr[j].time.getDate()==i)  {
+			retArr.push(arr[j]); 
+			break;
+		}
+	}
+  }
+  return retArr;
 
-};
-exports.dataFilterByMonth = function(datas, monthFormat){
-	//function get number of distributedd point from an array
-	// month format yyyy-mm
-    
-	var obj= monthFormat.split("-");
-	var year= obj[0];
-	var month= obj[1];
-	console.log(year);
-	console.log(month);
-    
-	var filter= datas.filter(data=> {
-		return  (new Date(data.time).getFullYear()==year)&&((new Date(data.time).getMonth()+1)==month);
-	});
-    
-	console.log("filter length: "+filter.length);
 
-	return filter;
 };
 function dataFilterByMonth(datas, monthFormat){
 	//function get number of distributedd point from an array
 	// month format yyyy-mm
-  
+    
 	var obj= monthFormat.split("-");
 	var year= obj[0];
 	var month= obj[1];
 	console.log(year);
 	console.log(month);
-  
+    
 	var filter= datas.filter(data=> {
 		return  (new Date(data.time).getFullYear()==year)&&((new Date(data.time).getMonth()+1)==month);
 	});
-  
-	console.log("filter length: "+filter.length);
+    
+	console.log("filter length before reducer: "+filter.length);
+	var retArr = reducerMonth(filter,month, year);
+	console.log("array length after reducer: "+ retArr.length)
+	return retArr;
+	//return filter;
+};
 
-	return filter;
-}
-
+exports.dataFilterByMonth = dataFilterByMonth;
 
 
 
@@ -214,32 +219,42 @@ exports.createBill=async function(user_id, month) {//month in format  string yyy
 	}
 	catch(err) {
 		console.log(err);
+		return;
 	}
 	if (user) {
 		console.log(user);
 		try {
-			var modbusData= await ModbusData.findOne({ip_address: user.ipAddress});
+			var modbusData= await ModbusData.findById({_id: user.meter});
 		}
 		catch(err) {
 			console.log(err);
-			return null;
+			return ;
 		}
-		if (modbusData== null) return null;
+		if (modbusData== null || modbusData==undefined) {
+			console.log(`this ${user.email} account doesnot have meter connected`)
+			return ;}
 		var filterData= dataFilterByMonth(modbusData.datas, month);
 		var total;
-		if (filterData.length==0) total=0;
+		if (filterData.length <= 1) total=0;
 
-		else total= (filterData[filterData.length-1].value- filterData[0].value).toFixed(2);
+		else total= (filterData[filterData.length-1].value[1]- filterData[0].value[1]).toFixed(2);
+		//total is sum amount power comsumption
+		//need to discuss formula to calculate money
 		var amount= (total*2000).toFixed(2);
 		console.log(filterData[filterData.length-1]);
 		console.log(filterData[0]);
 		console.log(total);
 
-		var html= "<html><head></head>";
-		html+=`<body><div style= "border: 1px solid"><h1>INVOICE</h1><h3>Bill to ${user.email}</h3>`;
-		html+=`<h5>Total power comsumption in month ${month} is: ${total}</h5>`;
-		html+= `<p>Total charge: ${amount} VND</p>`;
-		html+="<p>Please pay before ...</p>";
+		var html= "<html><head><style>"
+		html+='div{margin-top: 30px;margin-bottom:50px;}h1,h3{color: green;text-align:center;margin-top:40px;margin-bottom:50px}p{text-align:center;margin-bottom:  20px;}strong{font-weight:bold}';
+		
+
+		
+		html+= "</style></head>";
+		html+=`<body><div class= "container"><h1>INVOICE</h1><h3>Bill to ${user.email}</h3>`;
+		html+=`<p>Total power comsumption in month <strong>${month}</strong> is: <strong>${total}</strong> kWH</p>`;
+		html+= `<p>Total charge: <strong>${amount}</strong> VND</p>`;
+		html+="<p>Please pay before ... Thank you</p>";
 		html+="</div></body></html>";
 		if (!fs.existsSync("./bill")) //tao thu muc bill truoc
 		{
@@ -281,7 +296,7 @@ exports.deleteFile= function(filename){
 	}
 };
 //assume data: [kw, kwh]
-exports.addRecord= async function(ip,slaveId, records ){
+exports.addRecord= async function(ip,slaveId,dateInput, n) {
 	try {
 		var data= await ModbusData.findOne({ip_address: ip, slaveId: slaveId});
 	}
@@ -296,8 +311,21 @@ exports.addRecord= async function(ip,slaveId, records ){
 	}
    
 	else {
-		console.log("meter length: "+ data.datas.length);
-		data.datas=data.datas.concat(records);
+		var record=[];
+	var year= dateInput.getFullYear();
+	var month= dateInput.getMonth();
+	var date= dateInput.getDate();
+	var hour= dateInput.getHours();
+	var minute= dateInput.getMinutes();
+	for (let i=0; i< n;i++){
+		var  d= new Date(year, month, date, hour, minute+ 10*i, 0);
+    
+		record.push({time:d, value: [(100*Math.random()).toFixed(2),(10*Math.random()+10*i).toFixed(2),(10*Math.random()+10*i).toFixed(2)] });
+	}
+	console.log(date);
+		console.log("meter datas length before concat with record: "+ data.datas.length);
+		data.datas=data.datas.concat(record);
+		console.log("meter datas length before concat with record: "+ data.datas.length);
 		data.save(function(err){
 			if (err) {console.log(err);
    
@@ -309,20 +337,7 @@ exports.addRecord= async function(ip,slaveId, records ){
 	}
 
 };
-exports.createRecord =function(dateInput, n){
-	var record=[];
-	var year= dateInput.getFullYear();
-	var month= dateInput.getMonth();
-	var date= dateInput.getDate();
-	var hour= dateInput.getHours();
-	var minute= dateInput.getMinutes();
-	for (let i=0; i< n;i++){
-		var  d= new Date(year, month, date, hour, minute+ 10*i, 0);
-    
-		record.push({time:d, value: (10*Math.random()+10*i).toFixed(2) });
-	}
-	console.log(date);
-	return record;
-};
+
+	
 //viet doan chuong trinh automating job 
 
