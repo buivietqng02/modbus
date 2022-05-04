@@ -245,17 +245,17 @@ exports.createBill=async function(user_id, month) {//month in format  string yyy
 		console.log(filterData[0]);
 		console.log(total);
 
-		var html= "<html><head><style>"
-		html+='div{margin-top: 30px;margin-bottom:50px;}h1,h3{color: green;text-align:center;margin-top:40px;margin-bottom:50px}p{text-align:center;margin-bottom:  20px;}strong{font-weight:bold}';
+		var html= ""
+		
 		
 
 		
-		html+= "</style></head>";
-		html+=`<body><div class= "container"><h1>INVOICE</h1><h3>Bill to ${user.email}</h3>`;
-		html+=`<p>Total power comsumption in month <strong>${month}</strong> is: <strong>${total}</strong> kWH</p>`;
-		html+= `<p>Total charge: <strong>${amount}</strong> VND</p>`;
-		html+="<p>Please pay before ... Thank you</p>";
-		html+="</div></body></html>";
+		html+= "";
+		html+=`<div class= "container" style=""><h1  style="color: green;text-align:center;margin-top:40px;margin-bottom:50px">INVOICE</h1><h3 style="color: green;text-align:center;margin-top:40px;margin-bottom:50px">Bill to ${user.email}</h3>`;
+		html+=`<p style="text-align:center;margin-bottom:  20px;">Total power comsumption in month <strong>${month}</strong> is: <strong>${total}</strong> kWH</p>`;
+		html+= `<p style="text-align:center;margin-bottom:  20px;">Total charge: <strong style="font-weight:bold">${amount}</strong> VND</p>`;
+		html+='<p style="text-align:center;margin-bottom:  20px;">Please pay before ... Thank you</p>';
+		html+='</div>';
 		if (!fs.existsSync("./bill")) //tao thu muc bill truoc
 		{
 			fs.mkdirSync("./bill");
@@ -267,25 +267,39 @@ exports.createBill=async function(user_id, month) {//month in format  string yyy
 		}
 		var filePath=path+ "/"+ month+ ".html";
 		fs.writeFileSync(filePath, html);
-		convertToPDF(filePath);
+	 	 await convertToPDF(filePath);
+		 return 1;
+	
 	}
 
 };
-function convertToPDF(filename){
-	fs.readFile(filename, "utf8", function(err, result){
-		if (err) console.log(err);
-		else console.log("file html: "+ result);
-		var options= {
-			format: "Letter"
-		} ;
-		var pdfpath= path.parse(filename).dir+"/"+path.parse(filename).name +".pdf";
-		pdf.create(result, options).toFile(pdfpath, function(err, res){
-			if (err) return console.log(err);
-			console.log("converted ok");
-			sendEmail("quocvietqng02@gmail.com", pdfpath);
-		});
+   function   convertToPDF(filename){
+	   return new Promise((resolve, reject)=> {
+		fs.readFile(filename, "utf8", function(err, result){
+			if (err) {
+				console.log(err);
+				reject(err);
+			}
+			else console.log("file html: "+ result);
+			var options= {
+				format: "Letter"
+			} ;
+			var pdfpath= path.parse(filename).dir+"/"+path.parse(filename).name +".pdf";
+			pdf.create(result, options).toFile(pdfpath, function(err, res){
+				if (err)  {
+					console.log(err);
+					reject(err);
+				}
 
-	});
+				console.log("converted ok");
+				resolve("ok");
+			//	sendEmail("quocvietqng02@gmail.com", pdfpath);
+			});
+		});
+	   })
+	
+
+	
 }
 exports.deleteFile= function(filename){
 	if (fs.existsSync(filename)) {

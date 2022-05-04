@@ -3,6 +3,38 @@
             const context= canvas.getContext("2d");  
             const canvas2= document.getElementById("chart2")
             const context2= canvas2.getContext("2d");  
+            const bill= document.getElementById("bill");
+            const chart= document.getElementById("chart");
+            const btnBillView= document.getElementById("view-bill");
+            const display= document.querySelector(".display-section");
+            const billSection= document.querySelector('.bill-section');
+            const billDisplayDiv= document.getElementById("bill-html")
+            billSection.style.display='none';
+            bill.addEventListener('click', function(){
+                
+                display.style.display= "none";
+                billSection.style.display='block';
+            })
+          
+            btnBillView.addEventListener('click', function(){
+             let month= document.querySelector(".bill-month")
+             let value= month.value;
+             if (!value) return
+             console.log(/\d{4}-\d{2}/.test(value))
+             fetch(`/user/${id}/view-bill?month=${value}`)
+             .then(response=> response.text())
+             .then(text=>{
+                 console.log(text);
+                 billDisplayDiv.innerHTML= text;
+            })
+             .catch(err=> console.log(err))
+            })
+            
+            chart.addEventListener('click', function(){
+                billSection.style.display='none';
+                display.style.display= "block";
+            })
+
             function get_current_kw() {
                
                 
@@ -23,9 +55,9 @@
                 })
                 .catch(err=> console.log(err))
             }
-             setInterval(get_current_kw, 2000)
+             get_current_kw()
              //plot when load
-              var id = !{JSON.stringify(id)}
+              
                
                 var dateFormat= new Date()
                 let date= `${dateFormat.getFullYear()}-${dateFormat.getMonth()+1}-${dateFormat.getDate()}`
@@ -83,6 +115,7 @@
                     })
                 .catch((err)=> console.log(err))
                 }
+                
                 function handleMonthClick(month){
               
                

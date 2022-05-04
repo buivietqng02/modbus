@@ -4,6 +4,7 @@ var passport= require('passport');
 var ModbusData= require('../models/modbusData');
 var Modbus= require('../modbus.js');
 var User= require('../models/user.model');
+var path= require('path');
 var fs= require('fs');
 
 
@@ -42,23 +43,19 @@ router.post('/signin', passport.authenticate('local.signin', {
 router.get('/user/:id', async function(req, res, next){
   try {
  var user= await User.findById({_id: req.params.id});
+ console.log(req.session);
+ if (req.session.passport) {
+   res.render('user_page', {email: user.email, id: req.session.passport.user, });
+   } 
   }
   catch(err) {
     next(err);
     }
-    if (!user) 
-    {res.end('no user found');return }
- 
- 
- 
-  console.log(req.session);
-  res.render('user_page', {email: user.email, id: req.session.passport.user, 
- 
    
-   });
-})
+ })
 //return data to plot
 router.get('/user/:id/plot/date',async  function(req, res, next){
+
 
     var date= req.query.date
     console.log('data input: '+ date);
@@ -202,6 +199,29 @@ router.get('/user/:id/invoice', async function(req, res){
   
   
   }
+})
+router.get('/user/:id/view-bill', async function(req, res,next){
+  try {
+  let user= await User.findById({_id: req.params.id});
+  var email= user.email;
+  var month= req.query.month;
+  let pathString= `bill/${email}_bill/${month}.html`;
+    console.log(__dirname);
+    var pathResolve= path.resolve(pathString)
+    console.log(pathResolve)
+  
+  if (fs.existsSync(pathResolve)) {
+    console.log("true");
+    res.setHeader('content-type', 'text/html');
+    let data= fs.readFileSync(pathResolve);
+    res.end(data);
+  } else {
+    res.end("not ok");
+  }
+}
+catch (err) {
+  next(err);
+}
 })
 
 module.exports = router;

@@ -1,39 +1,39 @@
 extends users_template 
 block content 
-    div(style="float: right; color: red")
+    div( class="meter-search" style="float: right; color: red")
         form(method="GET" action='/admin/meters/search')
             input(type="text" placeholder="enter meter info: room, ip, slaveId .." name="search_info" style="width: 300px" )
             
             input(type= "submit" value="Search" style= "" )
-   
-    if meters    
-        each meter in meters 
-            div(style="margin-top: 50px; border-bottom: 1px solid")
-            ul 
-                li Modbus Gateway IP Addresss:  #{meter.ip_address} 
-                li Slave ID:  #{meter.slaveId} 
-                li Room:  #{meter.room} 
-                if status[meter.info]
-                    li(style="font-weight: bold") status: #{status[meter.info]}
-                else 
-                    li(style="color:red; font-weight:bold") status: not connected
-            
-                li
-                    p 
-                        a(href='/admin/meter/'+meter._id+'/delete') Delete Meter
-                if meter.user 
-                    li connect to: #{meter.user.email}
-                else 
-                    li(style="color: red") not connect to any user
-                li 
-                    input(type= "date")
-                    label(for="") Number of data 
-                    input(type= 'number')
-                    button(class="add-data") Add Data  
-                
-    else 
-        p not any meter available
-    
+    div(class="all-meters")
+        if meters    
+            each meter in meters 
+                div(class="meter-item" )
+                    ul 
+                        li Modbus Gateway IP Addresss:  #{meter.ip_address} 
+                        li Slave ID:  #{meter.slaveId} 
+                        li Room:  #{meter.room} 
+                        if status[meter.info]
+                            li(style="font-weight: bold") status: #{status[meter.info]}
+                        else 
+                            li(style="color:red; font-weight:bold") status: not connected
+                    
+                        li
+                            p 
+                                a(href='/admin/meter/'+meter._id+'/delete') Delete Meter
+                        if meter.user 
+                            li connect to: #{meter.user.email}
+                        else 
+                            li(style="color: red") not connect to any user
+                        li 
+                            input(type= "date")
+                            label(for="") Number of data 
+                            input(type= 'number')
+                            button(class="add-data") Add Data  
+                    
+        else 
+            p not any meter available
+        
     script().
         var search = !{JSON.stringify(search)}
         if (typeof search == undefined) {search= ''}

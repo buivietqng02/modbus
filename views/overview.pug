@@ -6,12 +6,12 @@ block content
        
         div(class= "graph per each hour" style="flex: 1; ")
             canvas(id="chart1")
-            div
+            div(class="select-day my-5")
                 label(for="select day") Select day
                 input(type= "date" name= "select day" )
         div(class="graph accumulated day" style= "flex: 1")
             canvas(id="chart2")
-            div
+            div(class="select-month my-5")
                 label(for="select day") Select month 
                 input(type= "month"  )
     script. 

@@ -5,8 +5,8 @@ html
     
     script(src="https://cdn.jsdelivr.net/npm/chart.js@3.6.0/dist/chart.min.js")
     link(rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous")
-    link(rel= "shorcut icon" href="#")
-    link(rel="stylesheet" href= "../stylesheets/style1.css")
+   
+    link(rel="stylesheet" href= "/stylesheets/style1.css")
     
       
 
@@ -17,29 +17,35 @@ html
     
     div(class= "container-fluid")
         div(class="row display")
-            div(class= "col-sm-2 menu" style= "border-right: 1px solid") 
+            div(class= "col-sm-2 menu" ) 
                 p Wellcome #{email}
                 
-                button(class= "btn-primary" id= "chart") Chart 
-                button( class= "btn-primary" id="bill") View Bill 
+                button(class= "btn btn-primary" id= "chart") Chart 
+                button( class= "btn btn-primary" id="bill") View Bill 
             div(class= "col-sm-10")
                 div(class="display-section")
-                    h3 Chart 
+                    h2 Chart 
                     h5(id="current") Power now
                     div(style= "display:flex;flex-direction: row ")
                 
             
-                        div(class= "graph per each hour" style="flex: 1; ")
-                            h4 Chart for power (kW) in day
+                        div(class= "graph per each hour" style="flex: 1;background-color: lightblue;margin-right: 10px ")
+                            h5 Chart for power (kW) in day
                             canvas(id="chart1")
                             label(for="select day") Select day
                             input(type= "date" name= "select day" )
-                        div(class="graph accumulated day" style= "flex: 1")
-                            h4 Chart for power comsumption each day in month
+                        div(class="graph accumulated day" style= "flex: 1;background-color: lightblue")
+                            h5 Chart for power comsumption each day in month
                             canvas(id="chart2")
                             label(for="select day") Select month 
                             input(type= "month"  )
-                div(class="bill-section")
+                section(class="bill-section")
+                    h4 VIEW BILL
+                    label(for="") Select month 
+                    input(type= "month" class= "bill-month"  )
+                    button(id="view-bill") VIEW BILL
+                    div(id="bill-html")
+
 
 
     script(). 
@@ -47,5 +53,5 @@ html
 
         var id=!{JSON.stringify(id)}
         console.log(id)
-    script(src= '../javascripts/file1.js')
+    script(src= '../javascripts/file2.js')
 

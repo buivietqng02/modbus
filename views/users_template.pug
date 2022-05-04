@@ -2,9 +2,9 @@ doctype html
 html
   head
     title= title
-    link(rel= "shortcut icon" href="#")
+    
     script(src="https://cdn.jsdelivr.net/npm/chart.js@3.6.0/dist/chart.min.js")
-    link(rel= "stylesheet" href= "http://localhost:3000/stylesheets/users_template.css")
+    link(rel= "stylesheet" href= "/stylesheets/users_template.css")
     link(rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous")
    
      
@@ -12,39 +12,35 @@ html
     
   body
    
-    div(class="container-fluid header" style= "margin-top: 50px")
-        div.row
-            h2 CUSTOMER MANAGEMENT SITE 
-            button(style="display:block;margin-left: 60%;") 
-                a(href='/' style="color: white") Signout 
-
-                
-                
-    
-
+    div(class="container-fluid header" )
+        h2 CUSTOMER MANAGEMENT SITE 
         
-        div.row(style="margin-top: 30px")   
+           
+        button(class= "sign-out-btn") 
+            a(href='/') Signout 
+
+        div.row   
              
-            div(class= " col-sm-3")
+            div(class= "navigate col-md-6 col-lg-2")
                 .get_users 
                      
                     a(href="/admin/users") SHOW ALL USERS
             
-                div(class="create_user" style= "margin-top: 30px")
+                div(class="create_user" )
                      
                     a(href="/admin/signup") CREATE USER
-                div(class="create_meter" style= "margin-top: 30px")
+                div(class="create_meter" )
                     a(href="/admin/meters") SHOW ALL METERS
-                div(class="overview" style= "margin-top: 30px")
+                div(class="overview" )
                      
                     a(href="/admin/create_meter") CREATE METER
-                div(class="overview" style= "margin-top: 30px")
+                div(class="overview" )
                      
                     a(href="/admin/overview") OVERVIEW
-                div(class="overview" style= "margin-top: 30px")
+                div(class="overview" )
                      
                     a(href="/admin/create_bill") CREATE BILL
                 
                 
-            div(class="col-sm-8")
+            div(class="col-md-6 col-lg-10")
                 block content 

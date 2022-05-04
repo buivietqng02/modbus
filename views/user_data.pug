@@ -1,6 +1,8 @@
 extends users_template 
 block content 
-    h1 User data 
+    h2 User data 
+    button(id="view-chart-btn") VIEW CHART 
+    button(id="view-bill-btn") VIEW BILL
     ul  
         li Username:  #{user.username} 
         li Email: #{user.email} 
@@ -12,24 +14,32 @@ block content
         li Status:
         li 
             a(href=`/admin/users/${user._id}/change_info`) Change user data
-    
-    h3 Chart
-    h5(id="current") Power now:  5kWh  
-    div(class= "container")
-       
-       
-        div(class= "graph per each hour" )
-            canvas(id="chart1")
-            div
-                label(for="select day") Select day
-                input(type= "date" name= "select day" )
-        div(class="graph accumulated day" )
-            canvas(id="chart2")
-            div
-                label(for="select day") Select month 
-                input(type= "month"  )
+    div(id="chart-section")
+        h3 Chart
+        h5(id="current") Power now:  5kWh  
+        div(class= "container-flex")
+        
+        
+            div(class= "graph per each hour" )
+                canvas(id="chart1")
+                div
+                    label(for="select day") Select day
+                    input(type= "date" name= "select day" )
+            div(class="graph accumulated day" )
+                canvas(id="chart2")
+                div
+                    label(for="select day") Select month 
+                    input(type= "month"  )
+    div(id="bill-section") 
+        h3 VIEW BILL
+        label(for="") Select month 
+        input(type= "month" class= "bill-month"  )
+        button(id="view-bill") VIEW BILL
+        div(id="bill-html")
     script. 
         var id1 =location.href.split('/')
         var id= id1[id1.length-1] 
+        console.log(id);
 
-    script(src='http://localhost:3000/javascripts/file1.js' type='text/javascript')   
+    script(src='/javascripts/file1.js' )  
+    script(src='/javascripts/view_bill.js') 

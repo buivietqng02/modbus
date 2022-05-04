@@ -1,13 +1,11 @@
 button {
-    margin: 40px;
+    margin: 10px;
     width: 50%;
 
 }
-.container-fluid {
-    margin-top: 50px;
-}
+
 button#chart, button#bill {
-    padding: 20px;
+    padding: 10px;
 }
 div.menu {
     background-color: lightgrey
@@ -15,11 +13,18 @@ div.menu {
 label {
         display: block;
 }
-h3 {
+h3, h2, h4 {
     text-align: center;
     background: black;
     color: white;
 }
 .menu {
-    padding-top: 30px;
+    padding-top: 20px;
+}
+#view-bill {
+    border: none;
+    padding: 5px;
+}
+#view-bill:hover {
+    background-color: rgba(0,0,0,.3);
 }

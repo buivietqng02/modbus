@@ -1,21 +1,35 @@
-extends layout
-block content 
-    div(class="signin container" style= "margin-top: 50px") 
+doctype html
+html
+  head
+    title= title
+    
+    script(src="https://cdn.jsdelivr.net/npm/chart.js@3.6.0/dist/chart.min.js")
+    link(rel="stylesheet", href="/stylesheets/common.css")
+       
+    link(rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous")
+  
+    
+      
+    
+  body
+    
+    div(class="container-fluid" ) 
         
-        div.center 
-            p= errorMessage 
-            if messages
-                each mess in messages 
-                    span= mess 
-            h3 Sign in 
-            form(action='/signin' method='POST')
-                div.form-group
-                    label(for='email') email 
-                    input(type='email' name= 'email' placeholder= 'email' class='form-control')
-                div.form-group 
-                    label(for= 'password') password
-                    input(type= 'password' name= 'password' placeholder= 'password' class='form-control')
-                button(class='btn btn-primary' type='submit')  Sign in 
-                br
-                br
-                a(href="/change_password_get") Change password 
+        div(class="row")
+            div(class="mx-auto col-lg-6 padding sign-in")
+                p= errorMessage 
+                if messages
+                    each mess in messages 
+                        span= mess 
+                h3(class="text-center") Sign in 
+                form(action='/signin' method='POST')
+                    div.form-group
+                        label(for='email') email 
+                        input(type='email' name= 'email' placeholder= 'email' class='form-control')
+                    div.form-group 
+                        label(for= 'password') password
+                        input(type= 'password' name= 'password' placeholder= 'password' class='form-control')
+                    button(class='btn btn-primary' type='submit')  Sign in 
+                    br
+                    br
+                    a(href="/change_password_get") Change password 

@@ -1,3 +1,6 @@
+body {
+   
+}
 ul {
     list-style-type: none
 }
@@ -7,9 +10,9 @@ button {
     font-weight: bold;
     text-transform: uppercase;
 }
-.container-fluid {
+/* .container-fluid {
     margin-top: 50px;
-}
+} */
 button#chart, button#bill {
     padding: 20px;
 }
@@ -18,6 +21,9 @@ div.menu {
 }
 h2 {
     text-align: center;
+    background-color: #3498db;
+    
+    text-shadow: 0px 0px 2px red;
 }
 h3 {
     text-align: center;
@@ -27,12 +33,15 @@ h3 {
 .menu {
     padding-top: 30px;
 }
-.container {
+.container-flex {
     display: flex;
     flex-direction: row;
 }
 input {
-    display: block;
+    
+}
+input[type="submit"] {
+    display: inline;
 }
 label {
     display: block;
@@ -40,3 +49,91 @@ label {
 .graph {
     flex: 1;
 }
+.loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    width: 60px;
+    height: 60px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+  }
+  
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .sign-out-btn {
+    background-color: rgba(100,100,100, 0.3);
+    
+  }
+.sign-out-btn a {
+    text-transform: uppercase;
+  
+}
+.all-users {
+    clear: both;
+}
+.all-users div:nth-of-type(odd) {
+    background-color: rgba(100,100,100, 0.3);
+}
+.all-users div:nth-of-type(even) {
+    background-color: rgba(100,100,100, 0.5);
+}
+.all-meters {
+    clear: both;
+}
+.all-meters div:nth-of-type(odd) {
+    background-color: rgba(100,100,100, 0.3);
+}
+.all-meters div:nth-of-type(even) {
+    background-color: rgba(100,100,100, 0.5);
+}
+.all-meters div {
+    padding: 20px;
+    margin: 20px;
+}
+.meter-search {
+    margin-bottom: 20px;
+}
+.user-search {
+    margin-bottom: 20px;
+}
+
+.navigate div {
+    margin: 20px 0;
+    padding: 0;
+
+}
+.btn-bill {
+    border: 1px solid;
+    padding: 10px;
+    border-radius: 5px;
+    display: block;
+    margin: 10px 0;
+    background-color: blue;
+    border: none;
+}
+.btn-bill:hover {
+    background-color: lightgreen;
+}
+#bill-section {
+    background-color: lightslategray;
+}
+#bill {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.loader {
+    
+    justify-content: center;
+}
+

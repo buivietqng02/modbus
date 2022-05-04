@@ -32,6 +32,8 @@ app.use(passport.session());
 app.use(function(req, res, next){
   if ((!req.session) || (!req.session.passport)){
     if (req.url!='/signin')  res.redirect('/signin')
+    
+
 
   }  
   next();
@@ -48,25 +50,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+var dev_mongoURL= 'mongodb://localhost:27017/test';
+//var mongo_URL= process.env.mongoDB || dev_mongoURL;
+var mongo_URL=  dev_mongoURL;
 
 
-
-/*  try {
-  mongoose.connect('mongodb+srv://vietbk02:vietbk02@cluster0.8yaqq.mongodb.net/nodemailer?retryWrites=true&w=majority',
-  {
-    useUnifiedTopology: true,
-    useNewUrlParser: true
-} 
-    );
-   }
-catch (err) {
-  console.log('error when access db'+ err.message);
-}
-
-    const db= mongoose.connection; 
-    db.once('open', ()=> {console.log('connected to db remote')}) */
     try {
-      mongoose.connect('mongodb://localhost:27017/test',
+      mongoose.connect(mongo_URL,
       {
         useUnifiedTopology: true,
         useNewUrlParser: true
@@ -85,7 +75,7 @@ catch (err) {
         //console.log(db);
        
         db.once('open', ()=> {
-          console.log('connected to db local');
+          console.log('connected to db ');
          
 
         })
@@ -98,6 +88,15 @@ app.use('/admin', adminRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
+});
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
 });
 
 // error handler
@@ -129,7 +128,7 @@ async function getAllMeterAndStartRead() {
    
   }
   
-  console.log(Modbus.socketList);
+  //console.log(Modbus.socketList);
 
 }
 //setInterval(getAllMeterAndStartRead, 20000);
@@ -140,7 +139,9 @@ async function getAllMeterAndStartRead() {
 
   
   
-  
+  process.on('uncaughtException', err=> {
+    console.error(err && err.stack);
+  })
   
  
   module.exports = app;
