@@ -52,7 +52,7 @@ app.use(cookieParser());
 
 var dev_mongoURL= 'mongodb://localhost:27017/test';
 //var mongo_URL= process.env.mongoDB || dev_mongoURL;
-var mongo_URL=  dev_mongoURL;
+var mongo_URL=  process.env.mongoDB || dev_mongoURL;
 
 
     try {

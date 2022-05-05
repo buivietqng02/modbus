@@ -223,5 +223,9 @@ catch (err) {
   next(err);
 }
 })
+router.post('/logout', (req, res)=> {
+  req.logout();
+  res.redirect('/');
+})
 
 module.exports = router;

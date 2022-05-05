@@ -15,9 +15,9 @@ html
     div(class="container-fluid header" )
         h2 CUSTOMER MANAGEMENT SITE 
         
-           
-        button(class= "sign-out-btn") 
-            a(href='/') Signout 
+        form(action='/logout' method='post')  
+            button(class= "btn btn-primary" type="submit")  Logout
+            
 
         div.row   
              
